@@ -17,7 +17,15 @@ include "../functions/methods.php"; ?>
         <?php
         $compData = SearchCompany(null, $_GET["company_id"]);
         foreach ($compData as $company) {
-            echo "<li>" . $company . "</li>";
+            foreach ($company as $key => $data) {
+                if ($key == "company_logo") {
+                    echo '<li><img width="150" src="data:image/jpeg;base64,' .
+                        $data .
+                        '"></li>';
+                } else {
+                    echo "<li>" . $data . "</li>";
+                }
+            }
         }
         ?>
             
