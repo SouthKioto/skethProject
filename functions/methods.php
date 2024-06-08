@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 @include "conn.php";
 
 function CheckAdminPermission($email)
@@ -23,6 +22,33 @@ function Logout()
     session_destroy();
     header("Location: index.php");
 }
+function RegisterUser($name, $surname, $email, $password)
+{
+    global $conn;
+    if (empty($name) && empty($surname) && empty($email) && empty($password)) {
+        echo "Prosze podać wartości dla wszystkich parametrów";
+    } else {
+        $query = "SELECT * FROM `users` WHERE name = '$name' 
+                    AND surname = '$surname'
+                    OR email = '$email'";
+        $result = $conn->query($query);
+
+        if ($result->num_rows > 0) {
+            echo "Użytkownik o takim imieniu, nazwisku oraz emailu istnieje";
+        } else {
+            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+            $query = "INSERT INTO users (name, surname, email, password_hash)
+                        VALUES ('$name', '$surname', '$email', '$passwordHash')";
+
+            $conn->query($query);
+
+            echo "Zostałeś zarejestrowany";
+
+            header("location: login.php");
+        }
+    }
+}
 function Login($email, $password)
 {
     global $conn;
@@ -30,16 +56,35 @@ function Login($email, $password)
         $query = "SELECT * FROM `users` WHERE `email` = '$email'";
         $result = $conn->query($query);
 
+        $userData = [];
         if (!$conn) {
             echo "Connection Error: " . $conn->error;
         } else {
             if ($result->num_rows > 0) {
                 if ($row = $result->fetch_object()) {
                     if (password_verify($password, $row->password_hash)) {
+                        $data = false;
                         if ($data = CheckAdminPermission($email)) {
                             //echo $data;
-                            $userData = [];
 
+                            $userData[] = [
+                                "user_id" => $row->user_id,
+                                "name" => $row->name,
+                                "surname" => $row->surname,
+                                "birth_date" => $row->birth_date,
+                                "email" => $row->email,
+                                "tel_number" => $row->tel_number,
+                                "prof_image" => base64_encode($row->prof_image),
+                                "curr_position" => $row->curr_position,
+                                "curr_position_description" =>
+                                    $row->curr_position_description,
+                                "career_summary" => $row->career_summary,
+                            ];
+
+                            $_SESSION["adminPerr"] = $data;
+                            $_SESSION["userData"] = $userData;
+                            $_SESSION["login"] = "true";
+                        } else {
                             $userData[] = [
                                 "user_id" => $row->user_id,
                                 "name" => $row->name,
@@ -71,7 +116,6 @@ function Login($email, $password)
         echo "Please enter your email and password";
     }
 }
-
 function SelectDataFormSession($dataArr, $name)
 {
     $result = "";
@@ -81,7 +125,6 @@ function SelectDataFormSession($dataArr, $name)
 
     return $result;
 }
-
 function SearchCompany($compName, $compId = null)
 {
     global $conn;

@@ -16,6 +16,9 @@
         <input type="submit" value="wroc" name="back">
     </form>
 
+    <p>Jesli nie posiadasz konta <a href="register.php">kliknij tutaj</a></p>
+    
+
     <?php if (isset($_POST["submit"])) {
         $email = $_POST["userEmail"];
         $pass = $_POST["userPassword"];

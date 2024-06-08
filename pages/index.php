@@ -23,9 +23,13 @@ include "../functions/methods.php"; ?>
                         "name"
                     ); ?> </h2>
                     <input type="submit" value="twoje konto" name="userAcc">
+
+                    <?php if ($_SESSION["adminPerr"] == true) { ?>
+                        <input type="submit" value="Strona administracyjna" name="adminPage">
+                    <?php } ?>
                 </p>
                 <p>
-                    <input type="submit" value="wologoj" name="logout">
+                    <input type="submit" value="wylogoj" name="logout">
                 </p>
             <?php } else { ?>
                 <p><input type="submit" value="logowanie" name="login"></p>
@@ -37,13 +41,14 @@ include "../functions/methods.php"; ?>
 
             <?php if (isset($_POST["logout"])) {
                 Logout();
-                //echo "sima";
             } elseif (isset($_POST["login"])) {
                 header("Location: login.php");
             } elseif (isset($_POST["userAcc"])) {
                 header("Location: userpage.php");
             } elseif (isset($_POST["search_comp"])) {
                 header("Location: searchCompPage.php");
+            } elseif (isset($_POST["adminPage"])) {
+                header("Location: adminPage.php");
             } ?>
         </form>
 
